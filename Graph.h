@@ -1,20 +1,15 @@
 #pragma once
-#include <string>
 #include <fstream>
-#include <list>
+#include "Vertex.h"
 
 using namespace std;
-
-class Edge;
-
-class Vertex;
 
 class Graph
 {
 
 public:
 
-	Graph();
+	class GraphIterator;
 
 	void addVertex(const Vertex& toAdd);
 	void addEdge(const Edge& toAdd);
@@ -25,18 +20,42 @@ public:
 	const bool containsVert(const Vertex& toContain) const;
 	const bool containsEdge(const Edge& toContain) const;
 
-	void moveTo(const Vertex& other);
 
-	const Vertex& getCurrentVert();
-	
-
+	const Vertex& getVert(const string& id) const;
+	const Edge& getEdge(const string& startId, const string& endId) const;
+	GraphIterator getIterator() const;
 	const size_t getNumOfVert() const;
+
+	class GraphIterator
+	{
+	public:
+		
+		GraphIterator();
+
+		GraphIterator(const list<Vertex>& parent);
+
+		const Vertex& operator*() const;
+
+		GraphIterator getBegin() const;
+		bool reachedEnd() const;
+
+		GraphIterator& operator++();
+		GraphIterator operator++(int);
+
+		GraphIterator& operator--();
+		GraphIterator operator--(int);
+
+	private:
+		
+		GraphIterator(const list<Vertex>* const parent, list<Vertex>::const_iterator it);
+
+		const list<Vertex>* const parent;
+		list<Vertex>::const_iterator it;
+
+	};
 
 private:
 
 	list<Vertex> vertices;
-
-	list<Vertex>::iterator changeIt;
-	mutable list<Vertex>::const_iterator traverseIt;
 
 };
