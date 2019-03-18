@@ -1,12 +1,4 @@
 #include "Graph.h"
-#include "Edge.h"
-#include "Vertex.h"
-
-Graph::Graph()
-{
-	changeIt = vertices.begin();
-	traverseIt = vertices.begin();
-}
 
 void Graph::addVertex(const Vertex& toAdd)
 {
@@ -19,30 +11,45 @@ void Graph::addVertex(const Vertex& toAdd)
 
 void Graph::addEdge(const Edge& toAdd)
 {
-	changeIt = vertices.begin();
+	GraphIterator graphIt(vertices);
 
-	for (changeIt; changeIt != vertices.end(); ++changeIt)
+	while (!graphIt.reachedEnd())
 	{
-		if (*changeIt == toAdd.getStart())
+
+		if (*graphIt == toAdd.getStart())
 		{
-			(*changeIt).add(toAdd);
+			const_cast<Vertex&>((*graphIt)).add(toAdd);
 		}
+
+		++graphIt;
 	}
+
 }
 
 void Graph::removeVertex(const Vertex& toRemove)
 {
 
-	if (containsVert(toRemove))
+	if (!containsVert(toRemove))
 	{
-		vertices.remove(toRemove);
-
+		return;
 	}
+
+	Graph::GraphIterator graphIt(vertices);
+
+	while (!graphIt.reachedEnd())
+	{
+		const_cast<Vertex&>((*graphIt)).remove(toRemove);
+
+		++graphIt;
+	}
+
 }
 
 void Graph::removeEdge(const Edge& toRemove)
 {
+
 	toRemove.getStart().remove(toRemove);
+
 }
 
 const bool Graph::containsVert(const Vertex& toContain) const
@@ -52,34 +59,120 @@ const bool Graph::containsVert(const Vertex& toContain) const
 
 const bool Graph::containsEdge(const Edge & toContain) const
 {
-	traverseIt = vertices.begin();
+	GraphIterator graphIt(vertices);
 
-	for (traverseIt; traverseIt != vertices.end(); ++traverseIt)
+	while (!graphIt.reachedEnd())
 	{
-		if ((*traverseIt).contains(toContain))
+		if ((*graphIt).contains(toContain))
 		{
 			return true;
 		}
+
+		++graphIt;
 	}
-	
+
 	return false;
 }
 
-void Graph::moveTo(const Vertex & other)
+
+const Vertex& Graph::getVert(const string& id) const
 {
-	if ((*changeIt).isAdjacentTo(other))
+
+	GraphIterator graphIt(vertices);
+
+	while (!graphIt.reachedEnd())
 	{
-		changeIt = find(vertices.begin(), vertices.end(), other);
+		if ((*graphIt).getID() == id)
+		{
+			return (*graphIt);
+		}
+
+		++graphIt;
 	}
+
 }
 
-const Vertex& Graph::getCurrentVert()
+const Edge & Graph::getEdge(const string& startId,const string& endId) const
 {
-	return (*changeIt);
+	GraphIterator graphIt(vertices);
+
+	while(!graphIt.reachedEnd())
+	{
+		if ((*graphIt).getID() == startId)
+		{
+			return (*graphIt).getEdge(endId);
+		}
+
+		++graphIt;
+	}
+
 }
 
+Graph::GraphIterator Graph::getIterator() const
+{
+	return GraphIterator(vertices);
+}
 
 const size_t Graph::getNumOfVert() const
 {
 	return vertices.size();
 }
+
+
+Graph::GraphIterator::GraphIterator():parent(nullptr)
+{
+}
+
+Graph::GraphIterator::GraphIterator(const list<Vertex>& parent):parent(&parent)
+{
+	it = parent.begin();
+}
+
+
+const Vertex & Graph::GraphIterator::operator*() const
+{
+	return (*it);
+}
+
+Graph::GraphIterator Graph::GraphIterator::getBegin() const
+{
+	return GraphIterator(parent,it);
+}
+
+bool Graph::GraphIterator::reachedEnd() const
+{
+	return it == parent->end();
+}
+
+Graph::GraphIterator& Graph::GraphIterator::operator++()
+{
+	++it;
+	return *this;
+}
+
+Graph::GraphIterator Graph::GraphIterator::operator++(int)
+{
+	GraphIterator toReturn(parent, it);
+	++it;
+	return toReturn;
+}
+
+Graph::GraphIterator& Graph::GraphIterator::operator--()
+{
+	++it;
+	return *this;
+}
+
+Graph::GraphIterator Graph::GraphIterator::operator--(int)
+{
+	GraphIterator toReturn(parent, it);
+	++it;
+	return toReturn;
+}
+
+Graph::GraphIterator::GraphIterator(const list<Vertex>* const parent, list<Vertex>::const_iterator it):parent(parent)
+{
+	this->it = it;
+}
+
+
