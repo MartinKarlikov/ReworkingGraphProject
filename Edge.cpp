@@ -1,35 +1,15 @@
 #include "Edge.h"
 #include "Vertex.h"
 
-Edge::Edge()
+Edge::Edge(const Vertex* const start,const Vertex* const end, const size_t weight):start(start),end(end),weight(weight)
 {
-	start = end = nullptr;
-	weight = 0;
-}
-
-Edge::Edge(Vertex* const start, Vertex* const end, const size_t weight)
-{
-	this->start = start;
-	this->end = end;
-	this->weight = weight;
-}
-
-Edge::Edge(const Edge & other)
-{
-	copyEdge(other);
-}
-
-Edge & Edge::operator=(const Edge & other)
-{
-	copyEdge(other);
-	return *this;
 }
 
 bool Edge::operator==(const Edge & other) const
 {
 	return start->getID() == other.start->getID()
-		&& end->getID() == other.end->getID()
-		&& this->weight == other.weight;
+		&& end->getID() == other.end->getID();
+
 }
 
 bool Edge::operator!=(const Edge & other) const
@@ -59,22 +39,15 @@ bool Edge::operator>=(const Edge & other) const
 
 Vertex& Edge::getStart() const
 {
-	return *start;
+	return const_cast<Vertex&>(*start);
 }
 
 Vertex& Edge::getEnd() const
 {
-	return *end;
+	return const_cast<Vertex&>(*end);
 }
 
 const size_t Edge::getWeight() const
 {
 	return weight;
-}
-
-void Edge::copyEdge(const Edge& other)
-{
-	this->start = other.start;
-	this->end = other.end;
-	this->weight = other.weight;
 }
