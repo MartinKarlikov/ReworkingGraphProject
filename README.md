@@ -13,24 +13,37 @@ Changes in the class:
 - Used to return a list of vertices
 + Now it returns a graph
 The reason can be seen in the general change of representation of the Graph class
-Also this class is hidden and can only be worked with from the perspective of the Graph class or GraphImp class (not yet reworked)
+Contains a iterator to it's list of edges as a member so that the proccess of traversal can be as abastract as possible.
+(Without creating a whole class for that matter.)
+Changes to the container will affect only the members of the class. (E.g. the list and it's iterator)
 
 *Edge class
 Represented as pointers to the two connecting Vertices and weight of the edge.
-Probably the most basic building block so no changes were made
+Probably the most basic building block so no changes were made, except removing a few redundancies.
 
 *Graph class
 A collection of Vertices representing the graph. At the moment that collection is represented by a list.
 
 Changes in the class:
 - Used to be implemented with the singleton design pattern as the programme had to have one graph opened at a time.
-+ Now it can have more than one instance and two iterators were added to the implementation
++ Now it can have more than one instance.
 --Reason - This way we have a way to hide as much as we can the container type (a.k.a the list) that is used
-for the implementation and also gives us a way to distinguish between the two different types of operations on the 
-graph - traversing or making changes to the graph. It also somewhat gives us concurrency over the two iterators as
-one type of operations does not affect the position of the iterator responsible for the other type of operations.
-All traversal is implemented by using these two iterators so if a decision is made to change the type of container
-the only place changes will be made are in the data members of the class.
+for the implementation by giving the chance for subgraphs to be created by different algorithms. For the same reason
+a GraphIterator was added so that we don't implement traversal mechanics in the graph - thus separating concerns.
+The Graph should only change if the way we keep vertices changes. Traversal is a different concern and is the only reason
+for the GraphIterator to change.
 
-+ Also one of the iterators is made mutable so that const operations CAN make changes to it as we make no change to the
-graph itself - a.k.a the logical view of our object so the operation is rightfully const
+*GraphParser class
+This class is used to load and save graphs to files. All work that revolves around saving and loading graphs to files
+should be delegated to an inastance of this class.
+
+The two functions that actually save/load graphs are made virtual so that if we want to add different behaviour or state
+to graphs (be it by representing the with new classes of Edges or Vertices, via inheritance, or more general changes to graphs
+or sub-classes of graphs) we can change the way they are saved simply by creating sub-classes of GraphParser.
+The reason the functions are hidden and encapsulated in public functions is that we give sub-classes a change to override behaviour
+not change the interface, which should stay stable.
+
+*GraphImp class
+All work with graphs should be done by an instance of this class. It delegates saving/loading graphs to files to an instance of
+GraphParser and runs Algorithms on the graph ( via the Algorithm class, soon to be added) and changes the Graph only by using
+the interface of Graph. The functions that let us add Vertex or Edge are made virtual with the same reasoning as seen in GraphParser
