@@ -1,33 +1,10 @@
 #include "Vertex.h"
-#include <iostream>
 #include "Graph.h"
-#include "Edge.h"
 
-Vertex::Vertex(const string identifier)
+Vertex::Vertex(const string& identifier)
 	:identifier(identifier)
 {
 	edgeIt = edges.begin();
-}
-
-Vertex::Vertex(const Vertex & other)
-{
-	copyVertex(other);
-}
-
-Vertex::~Vertex()
-{
-	edgeIt = edges.begin();
-
-	for (edgeIt; edgeIt != edges.end(); ++edgeIt)
-	{
-		(*edgeIt).getEnd().remove(*edgeIt);
-	}
-}
-
-Vertex & Vertex::operator=(const Vertex & other)
-{
-	copyVertex(other);
-	return *this;
 }
 
 void Vertex::add(const Edge& other)
@@ -49,11 +26,35 @@ void Vertex::remove(const Edge& toRemove)
 	}
 }
 
+void Vertex::remove(const Vertex & toRemove)
+{
+	edgeIt = edges.begin();
+
+	while (edgeIt != edges.end())
+	{
+
+		if ((*edgeIt).getEnd() == toRemove)
+		{
+
+			const Edge& edgeToDel = (*edgeIt);
+
+			++edgeIt;
+
+			edges.remove(edgeToDel);
+		}
+
+		else
+		{
+			++edgeIt;
+		}
+	}
+}
+
 const bool Vertex::isAdjacentTo(const Vertex & other) const
 {
 	edgeIt = edges.begin();
 
-	for (edgeIt; edgeIt != edges.end(); edgeIt++)
+	for (edgeIt; edgeIt != edges.end(); ++edgeIt)
 	{
 		if ((*edgeIt).getEnd() == other)
 		{
@@ -79,6 +80,19 @@ const bool Vertex::contains(const Edge & toContain) const
 	return (find(edges.begin(), edges.end(), toContain) != edges.end());
 }
 
+const Edge & Vertex::getEdge(const string& id) const
+{
+	edgeIt = edges.begin();
+
+	for (edgeIt; edgeIt != edges.end(); ++edgeIt)
+	{
+		if ((*edgeIt).getEnd().getID() == id)
+		{
+			return (*edgeIt);
+		}
+	}
+}
+
 const string& Vertex::getID() const
 {
 	return identifier;
@@ -89,7 +103,7 @@ const Graph Vertex::getAdjacent() const
 	Graph toReturn;
 
 	edgeIt = edges.begin();
-	
+
 	for (edgeIt; edgeIt != edges.end(); ++edgeIt)
 	{
 		toReturn.addVertex((*edgeIt).getEnd());
@@ -98,9 +112,18 @@ const Graph Vertex::getAdjacent() const
 	return toReturn;
 }
 
-void Vertex::copyVertex(const Vertex & other)
+const size_t Vertex::getEdgeWeight(const Vertex & other) const
 {
-	identifier = other.identifier;
+	edgeIt = edges.begin();
 
-	edges = other.edges;
+	for (edgeIt; edgeIt != edges.end(); ++edgeIt)
+	{
+		if ((*edgeIt).getEnd() == other)
+		{
+			return (*edgeIt).getWeight();
+		}
+	}
+
+	return 0;
 }
+
