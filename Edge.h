@@ -6,13 +6,7 @@ class Edge
 {
 public:
 
-	Edge();
-
-	Edge(Vertex* const start, Vertex* const end,const size_t weight);
-
-	Edge(const Edge& other);
-
-	Edge& operator=(const Edge& other);
+	Edge(const Vertex* const start,const Vertex* const end,const size_t weight);
 
 	bool operator==(const Edge& other) const;
 	bool operator!=(const Edge& other) const;
@@ -29,11 +23,9 @@ public:
 
 private:
 
-	void copyEdge(const Edge& other);
-
-	Vertex* start;
+	const Vertex* start;
 	
-	Vertex* end;
+	const Vertex* end;
 	
 	size_t weight;
 };
