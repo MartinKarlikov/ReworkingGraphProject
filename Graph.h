@@ -1,6 +1,8 @@
 #pragma once
 #include <fstream>
 #include "Vertex.h"
+#include <memory>
+#include <unordered_map>
 
 using namespace std;
 
@@ -10,6 +12,16 @@ class Graph
 public:
 
 	class GraphIterator;
+
+	Graph();
+
+	Graph(const Graph& other);
+	
+	Graph& operator=(const Graph& other);
+
+	~Graph();
+
+	Graph(Graph&& other);
 
 	void addVertex(const Vertex& toAdd);
 	void addEdge(const Edge& toAdd);
@@ -32,7 +44,7 @@ public:
 		
 		GraphIterator();
 
-		GraphIterator(const list<Vertex>& parent);
+		GraphIterator(const unordered_map<string, shared_ptr<Vertex>>& parent);
 
 		const Vertex& operator*() const;
 
@@ -46,16 +58,26 @@ public:
 		GraphIterator operator--(int);
 
 	private:
-		
-		GraphIterator(const list<Vertex>* const parent, list<Vertex>::const_iterator it);
 
-		const list<Vertex>* const parent;
-		list<Vertex>::const_iterator it;
+		
+		
+		GraphIterator(const unordered_map<string, shared_ptr<Vertex>>* const parent, unordered_map<string, shared_ptr<Vertex>>::const_iterator it);
+
+		const unordered_map<string, shared_ptr<Vertex>>* const parent;
+		unordered_map<string, shared_ptr<Vertex>>::const_iterator it;
 
 	};
 
 private:
 
-	list<Vertex> vertices;
+	virtual void doAddVertex(const Vertex& toAdd);
+	virtual void doAddEdge(const Edge& toAdd);
+
+	unordered_map<string,shared_ptr<Vertex>> vertices;
+
+	static vector<Graph*> graphs;
+	vector<Graph*>::const_iterator graphsIt;
 
 };
+
+

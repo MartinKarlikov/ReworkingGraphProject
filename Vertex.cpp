@@ -1,5 +1,11 @@
 #include "Vertex.h"
 #include "Graph.h"
+#include <iostream>
+
+Vertex::Vertex()
+{
+	identifier = "should not exist";
+}
 
 Vertex::Vertex(const string& identifier)
 	:identifier(identifier)
@@ -22,7 +28,18 @@ void Vertex::remove(const Edge& toRemove)
 {
 	if (contains(toRemove))
 	{
-		edges.remove(toRemove);
+		while (edgeIt != edges.end())
+		{
+
+			if ((*edgeIt) == toRemove)
+			{
+
+				edges.erase(edgeIt);
+				return;
+			}
+
+			++edgeIt;
+		}
 	}
 }
 
@@ -36,17 +53,11 @@ void Vertex::remove(const Vertex & toRemove)
 		if ((*edgeIt).getEnd() == toRemove)
 		{
 
-			const Edge& edgeToDel = (*edgeIt);
-
-			++edgeIt;
-
-			edges.remove(edgeToDel);
+			edges.erase(edgeIt);
+			return;
 		}
 
-		else
-		{
 			++edgeIt;
-		}
 	}
 }
 
@@ -107,6 +118,7 @@ const Graph Vertex::getAdjacent() const
 	for (edgeIt; edgeIt != edges.end(); ++edgeIt)
 	{
 		toReturn.addVertex((*edgeIt).getEnd());
+
 	}
 
 	return toReturn;

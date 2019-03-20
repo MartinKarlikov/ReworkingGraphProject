@@ -1,12 +1,10 @@
 #include "GraphImp.h"
 
-GraphImp::GraphImp(const string& graphId, bool directed)
+GraphImp::GraphImp(const string& graphId)
 {
 	currentGraphId = graphId;
 
-	isDirected = directed;
-
-	graph = unique_ptr<Graph>(new Graph);
+	graph = make_unique<Graph>();
 
 	loadGraph(graphId);
 
@@ -36,11 +34,13 @@ void GraphImp::addEdge(const string& startId,const string& endId, size_t weight)
 
 void GraphImp::removeVertex(const string& id) const
 {
+
 	graph->removeVertex(graph->getVert(id));
 }
 
 void GraphImp::removeEdge(const string& startId,const string& endId) const
 {
+
 	graph->removeEdge(graph->getEdge(startId, endId));
 
 	if (!isDirected)

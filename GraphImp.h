@@ -13,7 +13,7 @@ class GraphImp
 
 public:
 
-	GraphImp(const string& graphId, bool directed);
+	GraphImp(const string& graphId);
 
 	void loadGraph(const string& fileName);
 

@@ -1,27 +1,51 @@
 #include "Graph.h"
 
+
+vector<Graph*> Graph::graphs;
+
+Graph::Graph()
+{
+	graphs.push_back(this);
+}
+
+Graph::Graph(const Graph & other)
+{
+	vertices = other.vertices;
+	graphs.push_back(this);
+}
+
+Graph & Graph::operator=(const Graph & other)
+{
+	vertices = other.vertices;
+
+	return *this;
+}
+
+Graph::~Graph()
+{
+	graphs.erase(find(graphs.begin(), graphs.end(), this));
+}
+
+Graph::Graph(Graph && other)
+{
+	vertices = other.vertices;
+	other.vertices.clear();
+	graphs.push_back(this);
+}
+
 void Graph::addVertex(const Vertex& toAdd)
 {
-	if (!containsVert(toAdd))
+	if (!containsVert(Vertex(toAdd)))
 	{
-		vertices.push_back(toAdd);
-
+		doAddVertex(toAdd);
 	}
 }
 
 void Graph::addEdge(const Edge& toAdd)
 {
-	GraphIterator graphIt(vertices);
-
-	while (!graphIt.reachedEnd())
+	if (containsVert(toAdd.getStart()))
 	{
-
-		if (*graphIt == toAdd.getStart())
-		{
-			const_cast<Vertex&>((*graphIt)).add(toAdd);
-		}
-
-		++graphIt;
+		doAddEdge(toAdd);
 	}
 
 }
@@ -34,14 +58,9 @@ void Graph::removeVertex(const Vertex& toRemove)
 		return;
 	}
 
-	Graph::GraphIterator graphIt(vertices);
+	vertices[toRemove.getID()].reset();
 
-	while (!graphIt.reachedEnd())
-	{
-		const_cast<Vertex&>((*graphIt)).remove(toRemove);
-
-		++graphIt;
-	}
+	vertices.erase(toRemove.getID());
 
 }
 
@@ -54,21 +73,15 @@ void Graph::removeEdge(const Edge& toRemove)
 
 const bool Graph::containsVert(const Vertex& toContain) const
 {
-	return find(vertices.begin(), vertices.end(), toContain) != vertices.end();
+	return vertices.find(toContain.getID()) != vertices.end();
 }
 
 const bool Graph::containsEdge(const Edge & toContain) const
 {
-	GraphIterator graphIt(vertices);
 
-	while (!graphIt.reachedEnd())
+	if (containsVert(toContain.getStart()))
 	{
-		if ((*graphIt).contains(toContain))
-		{
-			return true;
-		}
-
-		++graphIt;
+		return (*vertices.find(toContain.getStart().getID())).second->contains(toContain);
 	}
 
 	return false;
@@ -78,34 +91,13 @@ const bool Graph::containsEdge(const Edge & toContain) const
 const Vertex& Graph::getVert(const string& id) const
 {
 
-	GraphIterator graphIt(vertices);
-
-	while (!graphIt.reachedEnd())
-	{
-		if ((*graphIt).getID() == id)
-		{
-			return (*graphIt);
-		}
-
-		++graphIt;
-	}
+	return (*(*vertices.find(id)).second);
 
 }
 
-const Edge & Graph::getEdge(const string& startId,const string& endId) const
+const Edge & Graph::getEdge(const string& startId, const string& endId) const
 {
-	GraphIterator graphIt(vertices);
-
-	while(!graphIt.reachedEnd())
-	{
-		if ((*graphIt).getID() == startId)
-		{
-			return (*graphIt).getEdge(endId);
-		}
-
-		++graphIt;
-	}
-
+	return (*vertices.find(startId)).second->getEdge(endId);
 }
 
 Graph::GraphIterator Graph::getIterator() const
@@ -118,12 +110,34 @@ const size_t Graph::getNumOfVert() const
 	return vertices.size();
 }
 
+void Graph::doAddVertex(const Vertex & toAdd)
+{
+	graphsIt = graphs.begin();
 
-Graph::GraphIterator::GraphIterator():parent(nullptr)
+	while (graphsIt != graphs.end())
+	{
+		if ((*graphsIt)->containsVert(toAdd))
+		{
+			vertices[toAdd.getID()] = (*graphsIt)->vertices[toAdd.getID()];
+			return;
+		}
+		++graphsIt;
+	}
+
+	vertices[toAdd.getID()] = make_shared<Vertex>(toAdd);
+}
+
+void Graph::doAddEdge(const Edge & toAdd)
+{
+	vertices[toAdd.getStart().getID()]->add(toAdd);
+}
+
+
+Graph::GraphIterator::GraphIterator() :parent(nullptr)
 {
 }
 
-Graph::GraphIterator::GraphIterator(const list<Vertex>& parent):parent(&parent)
+Graph::GraphIterator::GraphIterator(const unordered_map<string, shared_ptr<Vertex>>& parent) : parent(&parent)
 {
 	it = parent.begin();
 }
@@ -131,12 +145,12 @@ Graph::GraphIterator::GraphIterator(const list<Vertex>& parent):parent(&parent)
 
 const Vertex & Graph::GraphIterator::operator*() const
 {
-	return (*it);
+	return (*(*it).second);
 }
 
 Graph::GraphIterator Graph::GraphIterator::getBegin() const
 {
-	return GraphIterator(parent,it);
+	return GraphIterator(parent, it);
 }
 
 bool Graph::GraphIterator::reachedEnd() const
@@ -170,7 +184,8 @@ Graph::GraphIterator Graph::GraphIterator::operator--(int)
 	return toReturn;
 }
 
-Graph::GraphIterator::GraphIterator(const list<Vertex>* const parent, list<Vertex>::const_iterator it):parent(parent)
+
+Graph::GraphIterator::GraphIterator(const unordered_map<string, shared_ptr<Vertex>>* const parent, unordered_map<string, shared_ptr<Vertex>>::const_iterator it) :parent(parent)
 {
 	this->it = it;
 }

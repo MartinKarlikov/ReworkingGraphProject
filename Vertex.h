@@ -1,6 +1,6 @@
 #pragma once
 #include <string>
-#include <list>
+#include <vector>
 #include "Edge.h"
 
 class Graph;
@@ -11,6 +11,7 @@ class Vertex
 {
 public:
 
+	Vertex();
 	Vertex(const string& identifier);
 
 	void add(const Edge& other);
@@ -32,9 +33,9 @@ private:
 
 	string identifier;
 
-	list<Edge> edges;
+	vector<Edge> edges;
 
-	mutable list<Edge>::const_iterator edgeIt;
+	mutable vector<Edge>::const_iterator edgeIt;
 
 };
 
