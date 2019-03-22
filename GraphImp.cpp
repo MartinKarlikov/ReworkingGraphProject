@@ -1,4 +1,6 @@
 #include "GraphImp.h"
+#include "BFS.h"
+#include "Dijkstra.h"
 
 GraphImp::GraphImp(const string& graphId)
 {
@@ -8,7 +10,7 @@ GraphImp::GraphImp(const string& graphId)
 
 	loadGraph(graphId);
 
-	//alg = make_unique<Algorithm>(nullptr);
+	alg = unique_ptr<Algorithm>(getAlg("BFS"));
 
 }
 
@@ -47,6 +49,13 @@ void GraphImp::removeEdge(const string& startId,const string& endId) const
 	{
 		graph->removeEdge(graph->getEdge(endId, startId));
 	}
+}
+
+void GraphImp::executeAlg(const string & algId, const string & startId, const string & endId) const
+{
+	alg = unique_ptr<Algorithm>(getAlg(algId));
+	alg->execute(startId, endId);
+	
 }
 
 void GraphImp::saveGraph() const
@@ -109,5 +118,19 @@ void GraphImp::doAddEdge(const string& startId,const string& endId,const size_t 
 		Edge reverseAdd(end, start, weight);
 		graph->addEdge(reverseAdd);
 	}
+}
+
+Algorithm * GraphImp::getAlg(const string & name) const
+{
+	if (name == "BFS")
+	{
+		return new BFS(graph._Myptr());
+	}
+	if (name == "Dijkstra")
+	{
+		return new Dijkstra(graph._Myptr());
+	}
+	
+	return new BFS(graph._Myptr());
 }
 

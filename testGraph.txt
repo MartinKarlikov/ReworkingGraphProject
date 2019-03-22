@@ -1,0 +1,8 @@
+0
+6
+Georgia Sofia 1 Boston 1 Miami 5 /
+Chicago Boston 3 Miami 3 /
+Boston Chicago 3 Georgia 1 Sofia 1 Miami 3 /
+Miami Chicago 3 Georgia 5 Sofia 2 Boston 3 Kansas 3 /
+Sofia Georgia 1 Boston 1 Miami 2 Kansas 2 /
+Kansas Sofia 2 Miami 3 /

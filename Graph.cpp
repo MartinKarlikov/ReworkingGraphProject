@@ -142,6 +142,19 @@ Graph::GraphIterator::GraphIterator(const unordered_map<string, shared_ptr<Verte
 	it = parent.begin();
 }
 
+Graph::GraphIterator::GraphIterator(const GraphIterator & other):parent(other.parent)
+{
+	it = other.it;
+}
+
+Graph::GraphIterator & Graph::GraphIterator::operator=(const GraphIterator & other)
+{
+	parent = other.parent;
+	it = other.it;
+
+	return *this;
+}
+
 
 const Vertex & Graph::GraphIterator::operator*() const
 {
@@ -150,7 +163,12 @@ const Vertex & Graph::GraphIterator::operator*() const
 
 Graph::GraphIterator Graph::GraphIterator::getBegin() const
 {
-	return GraphIterator(parent, it);
+	return GraphIterator(parent, parent->begin());
+}
+
+Graph::GraphIterator Graph::GraphIterator::getLast() const
+{
+	return GraphIterator(parent, --parent->end());
 }
 
 bool Graph::GraphIterator::reachedEnd() const

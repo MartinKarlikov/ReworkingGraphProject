@@ -46,9 +46,14 @@ public:
 
 		GraphIterator(const unordered_map<string, shared_ptr<Vertex>>& parent);
 
+		GraphIterator(const GraphIterator& other);
+
+		GraphIterator& operator=(const GraphIterator& other);
+
 		const Vertex& operator*() const;
 
 		GraphIterator getBegin() const;
+		GraphIterator getLast() const;
 		bool reachedEnd() const;
 
 		GraphIterator& operator++();
@@ -63,7 +68,7 @@ public:
 		
 		GraphIterator(const unordered_map<string, shared_ptr<Vertex>>* const parent, unordered_map<string, shared_ptr<Vertex>>::const_iterator it);
 
-		const unordered_map<string, shared_ptr<Vertex>>* const parent;
+		const unordered_map<string, shared_ptr<Vertex>>* parent;
 		unordered_map<string, shared_ptr<Vertex>>::const_iterator it;
 
 	};

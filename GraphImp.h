@@ -3,8 +3,7 @@
 #include <iostream>
 #include "GraphParser.h"
 #include "Graph.h"
-
-//class Algorithm;
+#include "Algorithm.h"
 
 using namespace std;
 
@@ -23,7 +22,7 @@ public:
 	void removeVertex(const string& id) const;
 	void removeEdge(const string& startId,const string& endId ) const;
 
-	//void executeAlg(const string& algId,const string& startId,const string& endId) const;
+	void executeAlg(const string& algId,const string& startId,const string& endId) const;
 
 	void saveGraph() const;
 
@@ -38,7 +37,7 @@ private:
 
 	virtual void doAddEdge(const string& startId,const string& endId,const size_t weight) const;
 
-	//Algorithm* getAlg(string name) const;
+	Algorithm* getAlg(const string& name) const;
 
 	bool isDirected;
 
@@ -46,7 +45,7 @@ private:
 
 	unique_ptr<Graph> graph;
 
-	//unique_ptr<Algorithm> alg;
+	mutable unique_ptr<Algorithm> alg;
 
 	GraphParser parser;
 
