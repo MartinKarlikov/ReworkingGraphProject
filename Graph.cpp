@@ -28,7 +28,7 @@ Graph::~Graph()
 
 Graph::Graph(Graph && other)
 {
-	vertices = other.vertices;
+	vertices = move(other.vertices);
 	other.vertices.clear();
 	graphs.push_back(this);
 }
